@@ -3,6 +3,7 @@ import baker
 import json
 import requests
 import sys
+import time
 
 HOST = "http://rancher.local:8080"
 URL_SERVICE = "/v1/services/"
@@ -15,7 +16,10 @@ def get(url):
    return r
 
 def post(url, data):
-   r = requests.post(url, data=json.dumps(data), auth=(USERNAME, PASSWORD))
+   if data:
+      r = requests.post(url, data=json.dumps(data), auth=(USERNAME, PASSWORD))
+   else:
+      r = requests.post(url, data="", auth=(USERNAME, PASSWORD))
    r.raise_for_status()
 
 def print_json(data):
@@ -40,8 +44,12 @@ def query(service_id=""):
 #
 # Upgrades the service.
 #
-@baker.command(params={"service_id": "The ID of the service to upgrade.", "start_first": "Whether or not to start the new instance first before stopping the old one."})
-def upgrade(service_id, start_first=True,
+@baker.command(params={
+                        "service_id": "The ID of the service to upgrade.", 
+                        "start_first": "Whether or not to start the new instance first before stopping the old one.",
+                        "complete_previous": "If set and the service was previously upgraded but the upgrade wasn't completed, it will be first marked as Finished and then the upgrade will occur."
+                       })
+def upgrade(service_id, start_first=True, complete_previous=False,
             batch_size=1, interval_millis=10000):
    """Upgrades a service
 
@@ -61,6 +69,21 @@ def upgrade(service_id, start_first=True,
    r = get(HOST + URL_SERVICE + service_id)
    current_service_config = r.json()
    
+   # complete previous upgrade flag on
+   if complete_previous and current_service_config['state'] == "upgraded":
+      print "Previous service upgrade wasn't completed, completing it now..."
+      post(HOST + URL_SERVICE + service_id + "?action=finishupgrade", "")
+      r = get(HOST + URL_SERVICE + service_id)
+      current_service_config = r.json()
+
+      sleep_count = 0
+      while current_service_config['state'] != "active" and sleep_count < 60:
+         print "Waiting for upgrade to finish..."
+         time.sleep (2)
+         r = get(HOST + URL_SERVICE + service_id)
+         current_service_config = r.json()
+         sleep_count += 1
+      
    # can't upgrade a service if it's not in active state
    if current_service_config['state'] != "active":
       print "Service cannot be updated due to its current state: %s" % current_service_config['state']
