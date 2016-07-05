@@ -95,6 +95,7 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
 
    if imageUuid != None:
       upgrade_strategy['inServiceStrategy']['launchConfig']['imageUuid'] = imageUuid
+      print "New Image: %s" % upgrade_strategy['inServiceStrategy']['launchConfig']['imageUuid']
 
    # post the upgrade request
    post(current_service_config['actions']['upgrade'], upgrade_strategy)
