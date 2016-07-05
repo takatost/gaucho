@@ -47,9 +47,10 @@ def query(service_id=""):
 @baker.command(params={
                         "service_id": "The ID of the service to upgrade.", 
                         "start_first": "Whether or not to start the new instance first before stopping the old one.",
-                        "complete_previous": "If set and the service was previously upgraded but the upgrade wasn't completed, it will be first marked as Finished and then the upgrade will occur."
+                        "complete_previous": "If set and the service was previously upgraded but the upgrade wasn't completed, it will be first marked as Finished and then the upgrade will occur.",
+                        "imageUuid": "If set the config will be overwritten to use new image. Don't forget Rancher Formatting 'docker:<Imagename>:tag'"
                        })
-def upgrade(service_id, start_first=True, complete_previous=False,
+def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=None,
             batch_size=1, interval_millis=10000):
    """Upgrades a service
 
@@ -91,6 +92,9 @@ def upgrade(service_id, start_first=True, complete_previous=False,
 
    # Stuff the current service launch config into the request for upgrade
    upgrade_strategy['inServiceStrategy']['launchConfig'] = current_service_config['launchConfig']
+
+   if imageUuid != None:
+      upgrade_strategy['inServiceStrategy']['launchConfig']['imageUuid'] = imageUuid
 
    # post the upgrade request
    post(current_service_config['actions']['upgrade'], upgrade_strategy)
