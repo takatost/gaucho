@@ -12,7 +12,6 @@ Contributions are welcome if you want to use it and add to it.
 
 ## Usage
 ```
-./services.py --help
 Usage: ./services.py COMMAND <options>
 
 Available commands:
@@ -21,6 +20,54 @@ Available commands:
 
 Use './services.py <command> --help' for individual command help.
 ```
+
+
+### query
+
+```
+Usage: ./services.py query [<service_id>]
+
+Retrieves the service information.
+
+    If you don't specify an ID, data for all services will be retrieved.
+
+Options:
+
+   --service_id  The ID of the service to read (optional)
+```
+
+### upgrade
+
+```
+Usage: ./services.py upgrade <service_id> [<start_first>] [<complete_previous>] [<imageUuid>] [<batch_size>] [<interval_millis>]
+
+Upgrades a service
+
+    Performs a service upgrade, keeping the same configuration, but
+    otherwise pulling new image as needed and starting new containers,
+    dropping the old ones.
+
+Required Arguments:
+
+  service_id   The ID of the service to upgrade.
+
+Options:
+
+   --start_first        Whether or not to start the new instance first before
+                        stopping the old one.
+   --complete_previous  If set and the service was previously upgraded but the
+                        upgrade wasn't completed, it will be first marked as
+                        Finished and then the upgrade will occur.
+   --imageUuid          If set the config will be overwritten to use new
+                        image. Don't forget Rancher Formatting
+                        'docker:<Imagename>:tag'
+   --batch_size
+   --interval_millis
+
+(specifying a double hyphen (--) in the argument list means all
+subsequent arguments are treated as bare arguments, not options)
+```
+
 
 ## Rancher API Access
 
