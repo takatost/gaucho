@@ -6,7 +6,7 @@ import sys
 import time
 
 HOST = "http://rancher.local:8080"
-URL_SERVICE = "/v1/services/"
+URL_SERVICE = "/services/"
 USERNAME = "userid"
 PASSWORD = "password"
 
@@ -111,6 +111,18 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
 #
 if __name__ == '__main__':
    import os
+
+   # support for new Rancher agent services
+   # http://docs.rancher.com/rancher/latest/en/rancher-services/service-accounts/
+   if 'CATTLE_ACCESS_KEY' in os.environ:
+      USERNAME = os.environ['CATTLE_ACCESS_KEY']
+
+   if 'CATTLE_SECRET_KEY' in os.environ:
+      PASSWORD = os.environ['CATTLE_SECRET_KEY']
+
+   if 'CATTLE_URL' in os.environ:
+      HOST = os.environ['CATTLE_URL']
+
    if 'RANCHER_ACCESS_KEY' in os.environ:
       USERNAME = os.environ['RANCHER_ACCESS_KEY']
 
@@ -119,6 +131,11 @@ if __name__ == '__main__':
 
    if 'RANCHER_URL' in os.environ:
       HOST = os.environ['RANCHER_URL']
+
+   # make sure host ends with v1 
+   if not HOST.endswith ('/v1'):
+      HOST = HOST + '/v1'
+
 
    baker.run()
 
