@@ -7,3 +7,5 @@ RUN   pip install baker
 
 COPY services.py /app/gaucho
 RUN  chmod +x /app/gaucho
+
+ENTRYPOINT ["/app/gaucho"]

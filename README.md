@@ -11,16 +11,41 @@ requirements.
 Contributions are welcome if you want to use it and add to it.
 
 ## Usage
+
+Gaucho can be run directly on a command line provided you have Python installed
+as well as the dependencies listed below.
+
+It can also be run as a Docker container:
+
 ```
-Usage: ./services.py COMMAND <options>
-
-Available commands:
- query    Retrieves the service information.
- upgrade  Upgrades a service
-
-Use './services.py <command> --help' for individual command help.
+docker run --rm -it etlweather/gaucho query 1s245
 ```
 
+### Rancher Host, Access Key and Secret
+
+Gaucho needs to know the Rancher host and must be given an access key and access
+secret to be able to interact with the Rancher's API. This can be done through
+environment variables:
+
+   - `CATTLE_ACCESS_KEY`
+   - `CATTLE_SECRET_KEY`
+   - `CATTLE_URL`
+
+#### Rancher Agent Container
+
+If you run Gaucho in a container on Rancher, rather than set the environment 
+variables manually, use the following labels to have Rancher automatically do it
+for you.
+
+```
+io.rancher.container.create_agent=true
+io.rancher.container.agent.role=environment
+```
+
+See [Service Accounts in Rancher](http://docs.rancher.com/rancher/latest/en/rancher-services/service-accounts/)
+for more information on this feature.
+
+## Supported API
 
 ### query
 
@@ -67,21 +92,6 @@ Options:
 (specifying a double hyphen (--) in the argument list means all
 subsequent arguments are treated as bare arguments, not options)
 ```
-
-
-## Rancher API Access
-
-If you run Gaucho in a container on Rancher, rather than set the environment 
-variables manually for the Rancher URL, access key, etc, use the following 
-labels to have Rancher automatically do it for you.
-
-```
-io.rancher.container.create_agent=true
-io.rancher.container.agent.role=environment
-```
-
-See [Service Accounts in Rancher](http://docs.rancher.com/rancher/latest/en/rancher-services/service-accounts/)
-for more information on this feature.
 
 ## Dependencies
 
