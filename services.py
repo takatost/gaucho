@@ -107,7 +107,7 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
    r = get(HOST + URL_SERVICE + service_id)
    current_service_config = r.json()
    
-   print "Service State '%s.''" % current_service_config['state']
+   print "Service State '%s.'" % current_service_config['state']
 
 
    if auto_complete and current_service_config['state'] != "upgraded":
