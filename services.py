@@ -5,7 +5,7 @@ import requests
 import sys
 import time
 
-HOST = "http://rancher.local:8080"
+HOST = "http://rancher.local:8080/v1"
 URL_SERVICE = "/services/"
 USERNAME = "userid"
 PASSWORD = "password"
@@ -48,9 +48,10 @@ def query(service_id=""):
                         "service_id": "The ID of the service to upgrade.", 
                         "start_first": "Whether or not to start the new instance first before stopping the old one.",
                         "complete_previous": "If set and the service was previously upgraded but the upgrade wasn't completed, it will be first marked as Finished and then the upgrade will occur.",
-                        "imageUuid": "If set the config will be overwritten to use new image. Don't forget Rancher Formatting 'docker:<Imagename>:tag'"
+                        "imageUuid": "If set the config will be overwritten to use new image. Don't forget Rancher Formatting 'docker:<Imagename>:tag'",
+                        "auto_complete": "Set this to automatically 'finish upgrade' once upgrade is complete"
                        })
-def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=None,
+def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=None, auto_complete=False,
             batch_size=1, interval_millis=10000):
    """Upgrades a service
 
@@ -103,7 +104,43 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
 
    print "Upgrade of %s service started!" % current_service_config['name']
 
+   r = get(HOST + URL_SERVICE + service_id)
+   current_service_config = r.json()
+   
+   print "Service State '%s.'" % current_service_config['state']
 
+
+   if auto_complete and current_service_config['state'] != "upgraded":
+      print "Waiting for upgrade to finish"
+      
+      sleep_count = 0
+      while current_service_config['state'] != "upgraded" and sleep_count < 60:
+            print "."
+            time.sleep (2)
+            r = get(HOST + URL_SERVICE + service_id)
+            current_service_config = r.json()
+            sleep_count += 1
+
+      if current_service_config['state'] == "upgraded":
+         post(HOST + URL_SERVICE + service_id + "?action=finishupgrade", "")
+         r = get(HOST + URL_SERVICE + service_id)
+         current_service_config = r.json()
+         print "Auto Finishing Upgrade..."
+
+         upgraded_sleep_count = 0
+         while current_service_config['state'] != "active" and upgraded_sleep_count < 60:
+            print "."
+            time.sleep (2)
+            r = get(HOST + URL_SERVICE + service_id)
+            current_service_config = r.json()
+            upgraded_sleep_count += 1
+
+      if current_service_config['state'] == "active":
+         print "DONE"
+      
+      else:
+         print "Something has gone wrong!  Check Rancher UI for more details."
+         sys.exit(1)
 
 #
 # Script's entry point, starts Baker to execute the commands.

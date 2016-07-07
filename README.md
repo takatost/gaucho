@@ -86,6 +86,7 @@ Options:
    --imageUuid          If set the config will be overwritten to use new
                         image. Don't forget Rancher Formatting
                         'docker:<Imagename>:tag'
+   --auto_complete      Set this to automatically 'finish upgrade' once upgrade is complete               
    --batch_size
    --interval_millis
 
