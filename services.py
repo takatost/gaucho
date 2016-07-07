@@ -49,7 +49,7 @@ def query(service_id=""):
                         "start_first": "Whether or not to start the new instance first before stopping the old one.",
                         "complete_previous": "If set and the service was previously upgraded but the upgrade wasn't completed, it will be first marked as Finished and then the upgrade will occur.",
                         "imageUuid": "If set the config will be overwritten to use new image. Don't forget Rancher Formatting 'docker:<Imagename>:tag'",
-                        "auto_complete": "Set this to automatically finish upgrade once upgraded is complete"
+                        "auto_complete": "Set this to automatically 'finish upgrade' once upgrade is complete"
                        })
 def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=None, auto_complete=False,
             batch_size=1, interval_millis=10000):
@@ -126,10 +126,10 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
          r = get(HOST + URL_SERVICE + service_id)
          current_service_config = r.json()
          print "Auto Finishing Upgrade..."
-         
+
          upgraded_sleep_count = 0
          while current_service_config['state'] != "active" and upgraded_sleep_count < 60:
-            print "Waiting for auto upgrade to finish..."
+            print "."
             time.sleep (2)
             r = get(HOST + URL_SERVICE + service_id)
             current_service_config = r.json()
