@@ -5,7 +5,7 @@ import requests
 import sys
 import time
 
-HOST = "http://rancher.local:8080"
+HOST = "http://rancher.local:8080/v1"
 URL_SERVICE = "/services/"
 USERNAME = "userid"
 PASSWORD = "password"
@@ -122,11 +122,10 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
             sleep_count += 1
 
       if current_service_config['state'] == "upgraded":
-         print "."
          post(HOST + URL_SERVICE + service_id + "?action=finishupgrade", "")
          r = get(HOST + URL_SERVICE + service_id)
          current_service_config = r.json()
-         print "Finishing upgrade..."
+         print "Auto Finishing Upgrade..."
          
          upgraded_sleep_count = 0
          while current_service_config['state'] != "active" and upgraded_sleep_count < 60:
