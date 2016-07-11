@@ -4,6 +4,7 @@ import json
 import requests
 import sys
 import time
+from BaseHTTPServer import HTTPServer
 
 HOST = "http://rancher.local:8080/v1"
 URL_SERVICE = "/services/"
@@ -40,6 +41,17 @@ def query(service_id=""):
    r = get(HOST + URL_SERVICE + service_id)
    print_json(r.json())
 
+
+#
+# Converts a service name into an ID
+#
+@baker.command(params={"name": "The name of the service to lookup."})
+def id_of (name=""):
+   """Retrieves the ID of a service, given its name.
+   """
+
+   service = get(HOST + "/services?name=" + name).json()
+   return service['data'][0]['id']
 
 #
 # Upgrades the service.

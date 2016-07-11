@@ -61,6 +61,16 @@ Options:
    --service_id  The ID of the service to read (optional)
 ```
 
+### id_of
+
+Retrieves the ID of a service given its name.
+
+```
+ $ ./services.py cassandra
+1s130
+ $
+```
+
 ### upgrade
 
 ```
