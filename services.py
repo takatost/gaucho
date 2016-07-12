@@ -42,6 +42,7 @@ def query(service_id=""):
    print_json(r.json())
 
 
+
 #
 # Converts a service name into an ID
 #
@@ -61,10 +62,12 @@ def id_of (name=""):
                         "start_first": "Whether or not to start the new instance first before stopping the old one.",
                         "complete_previous": "If set and the service was previously upgraded but the upgrade wasn't completed, it will be first marked as Finished and then the upgrade will occur.",
                         "imageUuid": "If set the config will be overwritten to use new image. Don't forget Rancher Formatting 'docker:<Imagename>:tag'",
-                        "auto_complete": "Set this to automatically 'finish upgrade' once upgrade is complete"
+                        "auto_complete": "Set this to automatically 'finish upgrade' once upgrade is complete",
+                        "replace_env_name": "The name of an environment variable to be changed in the launch config (requires replace_env_value).",
+                        "replace_env_value": "The value of the environment variable to be replaced (requires replace_env_name)."
                        })
 def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=None, auto_complete=False,
-            batch_size=1, interval_millis=10000):
+            batch_size=1, interval_millis=10000, replace_env_name=None, replace_env_value=None):
    """Upgrades a service
 
    Performs a service upgrade, keeping the same configuration, but otherwise 
@@ -105,6 +108,13 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
 
    # Stuff the current service launch config into the request for upgrade
    upgrade_strategy['inServiceStrategy']['launchConfig'] = current_service_config['launchConfig']
+
+
+   # replace the environment variable specified (if one was)
+   if replace_env_name != None and replace_env_value != None:
+      print "Replacing environment variable %s from %s to %s" % (replace_env_name, upgrade_strategy['inServiceStrategy']['launchConfig']['environment'][replace_env_name], replace_env_value)
+      upgrade_strategy['inServiceStrategy']['launchConfig']['environment'][replace_env_name] = replace_env_value
+
 
    if imageUuid != None:
       # place new image into config

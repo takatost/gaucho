@@ -74,7 +74,7 @@ Retrieves the ID of a service given its name.
 ### upgrade
 
 ```
-Usage: ./services.py upgrade <service_id> [<start_first>] [<complete_previous>] [<imageUuid>] [<batch_size>] [<interval_millis>]
+Usage: ./services.py upgrade <service_id> [<start_first>] [<complete_previous>] [<imageUuid>] [<auto_complete>] [<batch_size>] [<interval_millis>] [<replace_env_name>] [<replace_env_value>]
 
 Upgrades a service
 
@@ -96,12 +96,14 @@ Options:
    --imageUuid          If set the config will be overwritten to use new
                         image. Don't forget Rancher Formatting
                         'docker:<Imagename>:tag'
-   --auto_complete      Set this to automatically 'finish upgrade' once upgrade is complete               
+   --auto_complete      Set this to automatically 'finish upgrade' once
+                        upgrade is complete
    --batch_size
    --interval_millis
-
-(specifying a double hyphen (--) in the argument list means all
-subsequent arguments are treated as bare arguments, not options)
+   --replace_env_name   The name of an environment variable to be changed in
+                        the launch config (requires replace_env_value).
+   --replace_env_value  The value of the environment variable to be replaced
+                        (requires replace_env_name).
 ```
 
 ## Dependencies
