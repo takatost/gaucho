@@ -131,31 +131,28 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
    
    print "Service State '%s.'" % current_service_config['state']
 
-
-   if auto_complete and current_service_config['state'] != "upgraded":
-      print "Waiting for upgrade to finish"
-      
-      sleep_count = 0
-      while current_service_config['state'] != "upgraded" and sleep_count < 60:
-            print "."
-            time.sleep (2)
-            r = get(HOST + URL_SERVICE + service_id)
-            current_service_config = r.json()
-            sleep_count += 1
-
-      if current_service_config['state'] == "upgraded":
-         post(HOST + URL_SERVICE + service_id + "?action=finishupgrade", "")
+   print "Waiting for upgrade to finish..."
+   sleep_count = 0
+   while current_service_config['state'] != "upgraded" and sleep_count < 60:
+         print "."
+         time.sleep (2)
          r = get(HOST + URL_SERVICE + service_id)
          current_service_config = r.json()
-         print "Auto Finishing Upgrade..."
+         sleep_count += 1
 
-         upgraded_sleep_count = 0
-         while current_service_config['state'] != "active" and upgraded_sleep_count < 60:
-            print "."
-            time.sleep (2)
-            r = get(HOST + URL_SERVICE + service_id)
-            current_service_config = r.json()
-            upgraded_sleep_count += 1
+   if auto_complete and current_service_config['state'] == "upgraded":
+      post(HOST + URL_SERVICE + service_id + "?action=finishupgrade", "")
+      r = get(HOST + URL_SERVICE + service_id)
+      current_service_config = r.json()
+      print "Auto Finishing Upgrade..."
+
+      upgraded_sleep_count = 0
+      while current_service_config['state'] != "active" and upgraded_sleep_count < 60:
+         print "."
+         time.sleep (2)
+         r = get(HOST + URL_SERVICE + service_id)
+         current_service_config = r.json()
+         upgraded_sleep_count += 1
 
       if current_service_config['state'] == "active":
          print "DONE"
