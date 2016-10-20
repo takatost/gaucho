@@ -58,7 +58,7 @@ def id_of (name=""):
 # Upgrades the service.
 #
 @baker.command(params={
-                        "service_id": "The ID of the service to upgrade.", 
+                        "service_id": "The ID of the service to upgrade.",
                         "start_first": "Whether or not to start the new instance first before stopping the old one.",
                         "complete_previous": "If set and the service was previously upgraded but the upgrade wasn't completed, it will be first marked as Finished and then the upgrade will occur.",
                         "imageUuid": "If set the config will be overwritten to use new image. Don't forget Rancher Formatting 'docker:<Imagename>:tag'",
@@ -70,8 +70,8 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
             batch_size=1, interval_millis=10000, replace_env_name=None, replace_env_value=None):
    """Upgrades a service
 
-   Performs a service upgrade, keeping the same configuration, but otherwise 
-   pulling new image as needed and starting new containers, dropping the old 
+   Performs a service upgrade, keeping the same configuration, but otherwise
+   pulling new image as needed and starting new containers, dropping the old
    ones.
    """
 
@@ -85,7 +85,7 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
 
    r = get(HOST + URL_SERVICE + service_id)
    current_service_config = r.json()
-   
+
    # complete previous upgrade flag on
    if complete_previous and current_service_config['state'] == "upgraded":
       print "Previous service upgrade wasn't completed, completing it now..."
@@ -100,7 +100,7 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
          r = get(HOST + URL_SERVICE + service_id)
          current_service_config = r.json()
          sleep_count += 1
-      
+
    # can't upgrade a service if it's not in active state
    if current_service_config['state'] != "active":
       print "Service cannot be updated due to its current state: %s" % current_service_config['state']
@@ -128,7 +128,7 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
 
    r = get(HOST + URL_SERVICE + service_id)
    current_service_config = r.json()
-   
+
    print "Service State '%s.'" % current_service_config['state']
 
    print "Waiting for upgrade to finish..."
@@ -139,6 +139,12 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
          r = get(HOST + URL_SERVICE + service_id)
          current_service_config = r.json()
          sleep_count += 1
+
+   if sleep_count >= 60:
+      print "Upgrading take to much time! Check Rancher UI for more details."
+      sys.exit(1)
+   else:
+      print "Upgraded"
 
    if auto_complete and current_service_config['state'] == "upgraded":
       post(HOST + URL_SERVICE + service_id + "?action=finishupgrade", "")
@@ -156,7 +162,7 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
 
       if current_service_config['state'] == "active":
          print "DONE"
-      
+
       else:
          print "Something has gone wrong!  Check Rancher UI for more details."
          sys.exit(1)
@@ -188,7 +194,7 @@ if __name__ == '__main__':
    if 'RANCHER_URL' in os.environ:
       HOST = os.environ['RANCHER_URL']
 
-   # make sure host ends with v1 
+   # make sure host ends with v1
    if not HOST.endswith ('/v1'):
       HOST = HOST + '/v1'
 
