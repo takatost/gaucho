@@ -54,6 +54,25 @@ def id_of (name=""):
    service = get(HOST + "/services?name=" + name).json()
    return service['data'][0]['id']
 
+
+
+#
+# Start containers within a service (e.g. for Start Once containers).
+#
+@baker.command(params={"service_id": "The ID of the service to start the containers of."})
+def start_containers (service_id):
+   """Starts the containers of a given service, typically a Start Once service.
+   """
+
+   # Get the array of containers
+   containers = get(HOST + URL_SERVICE + service_id + "/instances").json()['data']
+   for container in containers:
+      start_url = container['actions']['start']
+      print "Starting container %s with url %s" % (container['name'], start_url)
+      post(start_url, "")
+
+
+
 #
 # Upgrades the service.
 #
