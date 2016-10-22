@@ -7,3 +7,4 @@ RUN   pip install baker
 
 ENTRYPOINT ["/app/gaucho"]
 COPY services.py /app/gaucho
+RUN chmod +x /app/gaucho
