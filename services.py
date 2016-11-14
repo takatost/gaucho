@@ -83,10 +83,11 @@ def start_containers (service_id):
                         "imageUuid": "If set the config will be overwritten to use new image. Don't forget Rancher Formatting 'docker:<Imagename>:tag'",
                         "auto_complete": "Set this to automatically 'finish upgrade' once upgrade is complete",
                         "replace_env_name": "The name of an environment variable to be changed in the launch config (requires replace_env_value).",
-                        "replace_env_value": "The value of the environment variable to be replaced (requires replace_env_name)."
+                        "replace_env_value": "The value of the environment variable to be replaced (requires replace_env_name).",
+                        "timeout": "How many seconds to wait until an upgrade fails"
                        })
 def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=None, auto_complete=False,
-            batch_size=1, interval_millis=10000, replace_env_name=None, replace_env_value=None):
+            batch_size=1, interval_millis=10000, replace_env_name=None, replace_env_value=None, timeout=60):
    """Upgrades a service
 
    Performs a service upgrade, keeping the same configuration, but otherwise
@@ -113,7 +114,7 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
       current_service_config = r.json()
 
       sleep_count = 0
-      while current_service_config['state'] != "active" and sleep_count < 60:
+      while current_service_config['state'] != "active" and sleep_count < timeout // 2:
          print "Waiting for upgrade to finish..."
          time.sleep (2)
          r = get(HOST + URL_SERVICE + service_id)
@@ -152,14 +153,14 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
 
    print "Waiting for upgrade to finish..."
    sleep_count = 0
-   while current_service_config['state'] != "upgraded" and sleep_count < 60:
+   while current_service_config['state'] != "upgraded" and sleep_count < timeout // 2:
          print "."
          time.sleep (2)
          r = get(HOST + URL_SERVICE + service_id)
          current_service_config = r.json()
          sleep_count += 1
 
-   if sleep_count >= 60:
+   if sleep_count >= timeout // 2:
       print "Upgrading take to much time! Check Rancher UI for more details."
       sys.exit(1)
    else:
@@ -172,7 +173,7 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
       print "Auto Finishing Upgrade..."
 
       upgraded_sleep_count = 0
-      while current_service_config['state'] != "active" and upgraded_sleep_count < 60:
+      while current_service_config['state'] != "active" and upgraded_sleep_count < timeout // 2:
          print "."
          time.sleep (2)
          r = get(HOST + URL_SERVICE + service_id)
