@@ -116,6 +116,7 @@ Options:
                         the launch config (requires replace_env_value).
    --replace_env_value  The value of the environment variable to be replaced
                         (requires replace_env_name).
+   --timeout            How many seconds to wait until an upgrade fails
 ```
 
 ## Dependencies
