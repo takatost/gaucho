@@ -214,10 +214,9 @@ if __name__ == '__main__':
    if 'RANCHER_URL' in os.environ:
       HOST = os.environ['RANCHER_URL']
 
-   # make sure host ends with v1
-   if not HOST.endswith ('/v1'):
+   # make sure host ends with v1 if it is not contained in host
+   if '/v1' not in HOST:
       HOST = HOST + '/v1'
-
 
    baker.run()
 
