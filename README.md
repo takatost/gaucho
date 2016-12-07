@@ -1,11 +1,11 @@
 Gaucho
 ===========================================
 
-Gaucho is simply some Python scripts to access the 
+Gaucho is simply some Python scripts to access the
 [Rancher](https://github.com/rancher/rancher)'s API to perform tasks which
 I need to have executed through my deployment workflow.
 
-At this point, it does not contain much but it might grow as I get more 
+At this point, it does not contain much but it might grow as I get more
 requirements.
 
 Contributions are welcome if you want to use it and add to it.
@@ -33,7 +33,7 @@ environment variables:
 
 #### Rancher Agent Container
 
-If you run Gaucho in a container on Rancher, rather than set the environment 
+If you run Gaucho in a container on Rancher, rather than set the environment
 variables manually, use the following labels to have Rancher automatically do it
 for you.
 
@@ -118,6 +118,20 @@ Options:
                         (requires replace_env_name).
    --timeout            How many seconds to wait until an upgrade fails
 ```
+
+### execute command
+
+```
+Usage: ./gaucho execute <service_id> <command>
+
+Runs the given *command* on the first container found for the given *service id*.
+
+Required Arguments:
+
+  service_id   The ID of the service to perform the command on.
+  command      shell command to execute
+```
+
 
 ## Dependencies
 
