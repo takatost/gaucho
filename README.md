@@ -137,4 +137,5 @@ Required Arguments:
 
  - requests
  - baker
+ - websocket-client
 
