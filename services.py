@@ -4,6 +4,8 @@ import json
 import requests
 import sys
 import time
+import websocket
+import base64
 from BaseHTTPServer import HTTPServer
 
 HOST = "http://rancher.local:8080/v1"
@@ -22,6 +24,13 @@ def post(url, data):
    else:
       r = requests.post(url, data="", auth=(USERNAME, PASSWORD))
    r.raise_for_status()
+   return r.json()
+
+def ws(url):
+  webS = websocket.WebSocket()
+  webS.connect(url)
+  resp = webS.recv()
+  return base64.b64decode(resp)
 
 def print_json(data):
    print json.dumps(data, sort_keys=True, indent=3, separators=(',', ': '))
@@ -186,6 +195,47 @@ def upgrade(service_id, start_first=True, complete_previous=False, imageUuid=Non
       else:
          print "Something has gone wrong!  Check Rancher UI for more details."
          sys.exit(1)
+
+
+#
+# Execute remote command on container.
+#
+@baker.command(params={
+                        "service_id": "The ID of the service to execute on",
+                        "command": "The command to execute"
+                      })
+def execute(service_id,command):
+  """Execute remote command
+
+  Executes a command on one container of the service you specified.
+  """
+
+  # Get the array of containers
+  containers = get(HOST + URL_SERVICE + service_id + "/instances").json()['data']
+
+  # guard we have at least one container available
+  if len(containers) <= 0:
+    print "No container available"
+    sys.exit(1)
+
+  # take the first (random) container to execute the command on
+  execution_url = containers[0]['actions']['execute']
+  print "Executing '%s' on container '%s'" % (command, containers[0]['name'])
+
+  # prepare post payload
+  payload = json.loads('{"attachStdin": true,"attachStdout": true,"command": [],"tty": true}')
+  payload['command'].append(command)
+
+  # call execution action -> returns token and url for websocket access
+  intermediate = post(execution_url,payload)
+
+  ws_token = intermediate['token']
+  ws_url = intermediate['url'] + "?token=" + ws_token
+
+  # call websocket
+  print "> \n%s" % ws(ws_url)
+
+  print "DONE"
 
 #
 # Script's entry point, starts Baker to execute the commands.
