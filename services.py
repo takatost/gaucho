@@ -13,6 +13,7 @@ URL_SERVICE = "/services/"
 USERNAME = "userid"
 PASSWORD = "password"
 
+# HTTP
 def get(url):
    r = requests.get(url, auth=(USERNAME, PASSWORD))
    r.raise_for_status()
@@ -26,12 +27,14 @@ def post(url, data):
    r.raise_for_status()
    return r.json()
 
+# Websocket
 def ws(url):
-  webS = websocket.WebSocket()
-  webS.connect(url)
-  resp = webS.recv()
-  return base64.b64decode(resp)
+  webS = websocket.create_connection(url)
+  resp = base64.b64decode( webS.recv() )
+  webS.close()
+  return resp
 
+# Helper
 def print_json(data):
    print json.dumps(data, sort_keys=True, indent=3, separators=(',', ': '))
 
@@ -223,7 +226,7 @@ def execute(service_id,command):
   print "Executing '%s' on container '%s'" % (command, containers[0]['name'])
 
   # prepare post payload
-  payload = json.loads('{"attachStdin": true,"attachStdout": true,"command": [],"tty": true}')
+  payload = json.loads('{"attachStdin": true,"attachStdout": true,"command": ["/bin/sh","-c"],"tty": true}')
   payload['command'].append(command)
 
   # call execution action -> returns token and url for websocket access
@@ -232,7 +235,7 @@ def execute(service_id,command):
   ws_token = intermediate['token']
   ws_url = intermediate['url'] + "?token=" + ws_token
 
-  # call websocket
+  # call websocket and print answer
   print "> \n%s" % ws(ws_url)
 
   print "DONE"
