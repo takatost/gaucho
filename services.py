@@ -241,6 +241,50 @@ def execute(service_id,command):
   print "DONE"
 
 #
+# Rollback the service.
+#
+@baker.command(params={
+                        "service_id": "The ID of the service to rollback.",
+                        "timeout": "How many seconds to wait until an rollback fails"
+                       })
+def rollback(service_id, timeout=60):
+   """Performs a service rollback
+   """
+
+   r = get(HOST + URL_SERVICE + service_id)
+   current_service_config = r.json()
+
+   # can't rollback a service if it's not in upgraded state
+   if current_service_config['state'] != "upgraded":
+      print "Service cannot be updated due to its current state: %s" % current_service_config['state']
+      sys.exit(1)
+
+   # post the rollback request
+   post(current_service_config['actions']['rollback'], "");
+
+   print "Rollback of %s service started!" % current_service_config['name']
+
+   r = get(HOST + URL_SERVICE + service_id)
+   current_service_config = r.json()
+
+   print "Service State '%s.'" % current_service_config['state']
+
+   print "Waiting for rollback to finish..."
+   sleep_count = 0
+   while current_service_config['state'] != "active" and sleep_count < timeout // 2:
+         print "."
+         time.sleep (2)
+         r = get(HOST + URL_SERVICE + service_id)
+         current_service_config = r.json()
+         sleep_count += 1
+
+   if sleep_count >= timeout // 2:
+      print "Rolling back take to much time! Check Rancher UI for more details."
+      sys.exit(1)
+   else:
+      print "Rolled back"
+
+#
 # Script's entry point, starts Baker to execute the commands.
 # Attempts to read environment variables to configure the program.
 #
