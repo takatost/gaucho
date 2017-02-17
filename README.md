@@ -150,25 +150,6 @@ Required Arguments:
   command      shell command to execute
 ```
 
-
-### Rollback
-
-```
-Usage: ./services.py rollback <service_id>
-
-Rolls back service
-
-    Performs a service rollback
-
-Required Arguments:
-
-  service_id   The ID of the service to roll back.
-
-Options:
-
-   --timeout            How many seconds to wait until an upgrade fails
-```
-
 ## Dependencies
 
  - requests
