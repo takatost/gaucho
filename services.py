@@ -84,7 +84,6 @@ def start_containers (service_id):
       post(start_url, "")
 
 
-
 #
 # Upgrades the service.
 #
@@ -283,6 +282,32 @@ def rollback(service_id, timeout=60):
       sys.exit(1)
    else:
       print "Rolled back"
+
+
+#
+# Activate a service.
+#
+@baker.command(params={"service_id": "The ID of the service to deactivate."})
+def activate (service_id):
+   """Activate the containers of a given service.
+   """
+
+   r = get(HOST + URL_SERVICE + service_id)
+   current_service_config = r.json()
+   post(current_service_config['actions']['activate'], "");
+
+#
+# Deactivate a service.
+#
+@baker.command(params={"service_id": "The ID of the service to deactivate."})
+def deactivate (service_id):
+   """Stops the containers of a given service. (e.g. for maintenance purposes)
+   """
+
+   r = get(HOST + URL_SERVICE + service_id)
+   current_service_config = r.json()
+   post(current_service_config['actions']['deactivate'], "");
+
 
 #
 # Script's entry point, starts Baker to execute the commands.

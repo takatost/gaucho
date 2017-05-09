@@ -150,6 +150,30 @@ Required Arguments:
   command      shell command to execute
 ```
 
+### activate command
+
+```
+Usage: ./gaucho activate <service_id>
+
+Activate the given *service id*.
+
+Required Arguments:
+
+  service_id   The ID of the service to perform the command on.
+```
+
+### deactivate command
+
+```
+Usage: ./gaucho deactivate <service_id>
+
+Deactivate the given *service id*.
+
+Required Arguments:
+
+  service_id   The ID of the service to perform the command on.
+```
+
 ## Dependencies
 
  - requests
