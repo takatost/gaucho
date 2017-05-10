@@ -287,26 +287,59 @@ def rollback(service_id, timeout=60):
 #
 # Activate a service.
 #
-@baker.command(params={"service_id": "The ID of the service to deactivate."})
-def activate (service_id):
+@baker.command(params={"service_id": "The ID of the service to deactivate.",
+                        "timeout": "How many seconds to wait until an upgrade fails"})
+def activate (service_id, timeout=60):
    """Activate the containers of a given service.
    """
 
    r = get(HOST + URL_SERVICE + service_id)
    current_service_config = r.json()
+
+   # can't deactivate a service if it's not in active state
+   if current_service_config['state'] != "inactive":
+      print "Service cannot be deactivated due to its current state: %s" % current_service_config['state']
+      sys.exit(1)
+
    post(current_service_config['actions']['activate'], "");
+
+   # Wait deactivation to finish
+   sleep_count = 0
+   while current_service_config['state'] != "active" and sleep_count < timeout // 2:
+      print "Waiting for activation to finish..."
+      time.sleep (2)
+      r = get(HOST + URL_SERVICE + service_id)
+      current_service_config = r.json()
+      sleep_count += 1
+
 
 #
 # Deactivate a service.
 #
-@baker.command(params={"service_id": "The ID of the service to deactivate."})
-def deactivate (service_id):
+@baker.command(params={"service_id": "The ID of the service to deactivate.",
+                        "timeout": "How many seconds to wait until an upgrade fails"})
+def deactivate (service_id, timeout=60):
    """Stops the containers of a given service. (e.g. for maintenance purposes)
    """
 
    r = get(HOST + URL_SERVICE + service_id)
    current_service_config = r.json()
+
+   # can't deactivate a service if it's not in active state
+   if current_service_config['state'] != "active":
+      print "Service cannot be deactivated due to its current state: %s" % current_service_config['state']
+      sys.exit(1)
+
    post(current_service_config['actions']['deactivate'], "");
+
+   # Wait deactivation to finish
+   sleep_count = 0
+   while current_service_config['state'] != "inactive" and sleep_count < timeout // 2:
+      print "Waiting for deactivation to finish..."
+      time.sleep (2)
+      r = get(HOST + URL_SERVICE + service_id)
+      current_service_config = r.json()
+      sleep_count += 1
 
 
 

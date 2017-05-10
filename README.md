@@ -160,6 +160,10 @@ Activate the given *service id*.
 Required Arguments:
 
   service_id   The ID of the service to perform the command on.
+
+Options:
+
+   --timeout            How many seconds to wait until get back prompt on activation
 ```
 
 ### deactivate command
@@ -172,6 +176,10 @@ Deactivate the given *service id*.
 Required Arguments:
 
   service_id   The ID of the service to perform the command on.
+
+Options:
+
+   --timeout            How many seconds to wait until get back prompt on deactivation
 ```
 
 ### Get service's state
