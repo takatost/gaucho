@@ -174,6 +174,19 @@ Required Arguments:
   service_id   The ID of the service to perform the command on.
 ```
 
+### Get service's state
+
+```
+Usage: ./gaucho state <service_id>
+
+Print state of the given *service id*.
+
+Required Arguments:
+
+  service_id   The ID of the service to check.
+```
+
+
 ## Dependencies
 
  - requests

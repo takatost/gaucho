@@ -309,6 +309,19 @@ def deactivate (service_id):
    post(current_service_config['actions']['deactivate'], "");
 
 
+
+#
+# Get a service state
+#
+@baker.command(default=True, params={"service_id": "The ID of the service to read"})
+def state(service_id=""):
+   """Retrieves the service state information.
+   """
+
+   r = get(HOST + URL_SERVICE + service_id)
+   print(r.json()["state"])
+
+
 #
 # Script's entry point, starts Baker to execute the commands.
 # Attempts to read environment variables to configure the program.
